@@ -1,0 +1,301 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+struct node		// Structure to store information
+{
+	string name;
+	int regno;
+	float money = 100000;
+	float messbill;
+	string category;
+	string discount;
+	bool OneMealFree;	// For Staff Members
+
+};
+
+/// <summary>
+///		First semester batch is of 2020, Second year is 2019 and so on. Click On Any Function And Press F12 To See its Code
+///		Each Student is given 100,000 Rupees in the start to see whether the mess bill is even paid or not.
+///		Mess bill is created without asking each day's meal and breakfast checkin. Just asks the number of days.
+/// </summary>
+class Mess
+{
+public:
+	
+	Mess()
+	{
+		size = 5;	// Total size of Array
+		counter = 0;	// This will be the size upto where the info is stored
+		n = new node[size];	// Dynamic Allocation
+	}
+	void Signup();	
+	void BillCheck(string name);
+	void GenerateBill(int days, node*& temp);
+private:
+	int size;
+	int counter;
+	node* n;
+	bool StudentRegCheck(string reg,string& discount);
+	bool GraduateNumberCheck(string reg, string& discount);
+	void SizeIncrease();
+	
+};
+
+
+int main()
+{
+	string name;
+	Mess m;
+	char op;	// Using character variable for Exception Handling
+	do
+	{
+		system("cls");
+		cout << "1. Sign-Up\n\n"
+			<< "2. Check Mess Bill\n\n"
+			<< "Press Any Other Key And Press Enter To Exit\n\n"
+			<< "Choose: ";
+		cin >> op;
+		
+		switch (op)	// Switch Case function
+		{
+			system("pause");	// Pause the program till you press any button
+		case '1':
+			m.Signup();
+			break;
+		case '2':
+
+			cin.ignore();
+			cout << "Name: ";
+			getline(cin, name);
+			m.BillCheck(name);
+			break;
+		default:
+			cout << "Exiting Program\n\n";
+			system("pause");
+			exit(1);	// Used to exit program
+		}
+	} while (true);
+}
+
+//												SIGN-UP INTERFACE
+
+void Mess::Signup()
+{
+	node* temp = new node;	// Creating a new node
+	string regno;	// For exception handling, I made it a string variable
+	char op;
+	system("cls");
+	cout << "Select A Category: \n\n"			// Choose a category so that we can store the relevant discount in the node structure
+		<< "1. Student\n"
+		<< "2. Graduate\n"
+		<< "3. Associate Professor\n"
+		<< "4. Staff\n"
+		<< "5. Research Associates\n\n"
+		<< "Choose: ";
+	cin >> op;
+	switch (op)
+	{
+	case '1':
+		temp->category = "Student";
+		do
+		{
+			cout << "Registration Number: ";
+			cin >> regno;
+		} while (!StudentRegCheck(regno,temp->discount));		// Checks if the Registration Number is typed correctly
+		temp->OneMealFree = false;
+		break;
+	case '2':
+		temp->category = "Graduate";
+		do
+		{
+			cout << "Graduate Number: ";
+			cin >> regno;
+		} while (!GraduateNumberCheck(regno, temp->discount));	// Checks if the Graduate Number is typed correctly
+		temp->OneMealFree = false;
+		break;
+	case '3':
+		temp->category = "Associate Teacher";
+		temp->discount = "100";
+		temp->OneMealFree = false;
+		break;
+	case '4':
+		temp->category = "Staff";
+		temp->OneMealFree = true;
+		break;
+	case '5':
+		temp->category = "Research Associates";
+		temp->discount = "0";
+		temp->OneMealFree = false;
+		break;
+	default:
+		temp->category = "NILL";	// If an invalid option is selected, this will be used to tell
+		system("pause");
+	}
+	if (temp->category != "NILL")
+	{
+		cin.ignore();
+		cout << "Name: ";
+		getline(cin, temp->name);
+
+		n[counter].name = temp->name;
+		n[counter].category = temp->category;
+		n[counter].OneMealFree = temp->OneMealFree;
+		n[counter].discount = temp->discount;
+		n[counter].regno = stoi(regno);
+		counter++;	// Each time info is stored in a part of array, this counter increases
+		if (counter + 1 >= size)	// If the counter increases or is equal to the total size of array, We increase the size dynamically
+			SizeIncrease();
+	}
+	system("pause");
+}
+
+//											REGISTRATION NUMBER CHECK
+
+bool Mess::StudentRegCheck(string reg, string& discount)
+{
+	if (reg.length() != 7)	// Checking the length of registration Number
+	{
+		cout << "Invalid Registration Number!\n";
+		system("pause");
+		system("cls");
+		return false;
+	}
+	else
+	{
+		if (reg.substr(0, 4) == "2020")		// Allocating Discounts according to batches
+			discount = "0";
+		else if (reg.substr(0, 4) == "2019")
+			discount = "20";
+		else if (reg.substr(0, 4) == "2018")
+			discount = "30";
+		else if (reg.substr(0, 4) == "2017")
+			discount = "50";
+		return true;
+	}
+	cout << "Invalid Registration Number!\nReg Numbers must be between 2017-2020\n";
+	system("pause");
+	return false;
+}
+
+//												GRADUATE NUMBER CHECK
+
+bool Mess::GraduateNumberCheck(string reg, string& discount)
+{
+	int search;
+	if (search = reg.find("IF") != string::npos)
+	{
+		discount = "40";
+		return true;
+	}
+	else if (search = reg.find("gcs") != string::npos)
+	{
+		discount = "10";
+		return true;
+	}
+	cout << "Invalid GA Number!\nIt must have either IF or gcs before it\n";
+	system("pause");
+	return false;
+
+}
+
+//												INCREASING SIZE FUNCTION
+
+void Mess::SizeIncrease()
+{
+	node* t = new node[size * 2];	//	A new array of double size
+	for (int i = 0; i < size; i++)
+		*(t + i) = *(n + i);	// Copy All Contents of original array to the new array 
+	n = t;	// Making the og array equal to the temporary array. This will increase the size of array without changing its information
+	size *= 2;	// Size is increased
+}
+
+//												MAKING THE BILL RECEIPT
+
+void Mess::BillCheck(string name)
+{
+	system("pause");
+	char op;
+	int days;
+	node* temp = new node;
+	for (int i = 0; i < counter; i++)
+	{
+		if (n[i].name == name)	//	 Finding the name entered in the list and making the temporary node equal to that node
+		{
+			temp->name = name;
+			temp->category = n[i].category;
+			temp->discount = n[i].discount;
+			temp->messbill = n[i].messbill;
+			temp->money = n[i].money;
+			temp->OneMealFree = n[i].OneMealFree;
+			temp->regno = n[i].regno;
+			break;
+		}
+	}
+	if (temp->name != name)	// If the loop ends without finding the name, this tells that an Invalid Name was entered
+	{
+		cout << "Name not found!\n";
+		system("pause");
+		return;
+	}
+	cout << "1. No. Of Check-in in a month\n\n"
+		<< "2. The Whole Semester\n\n"
+		<< "Choose: ";
+	cin >> op;
+	if (op == '1')
+	{
+		cout << "Enter the Number of days: ";
+		cin >> days;
+		GenerateBill(days, temp);
+	}
+	else
+		GenerateBill(180, temp);	// If the whole semester option is selected, the days are made equal to 6*30 = 180
+}
+
+//												GENERATING BILL RECEIPT
+
+void Mess::GenerateBill(int days, node*& temp)
+{
+	char op;
+	int freemeal = 0;	// For Research Associates
+	freemeal = days / 11;
+	freemeal = days - freemeal;
+	float messbill = 0;
+	float discount = 0;
+	if (temp->category == "Associate Teacher")		// Meal is free for Associate Teachers
+	{
+		cout << "You have free meal access :)\n\n";
+		system("pause");
+		return;
+	}
+	if (temp->category == "Research Associate")	//	Every 11 Day of Checkin is free for Research Associates
+		messbill += (freemeal * (200 + 80));
+	else
+	{
+			messbill += (days * (200 + 80));
+			discount = messbill * stoi(temp->discount) / 100;	// Calculating the discount. stoi() converts the string into integer
+			messbill -= discount;
+	}
+		
+	//												Bill Receipt
+
+	cout << "Considering You Had All BreakFasts the day you checked in, Your Mess Bill is: \n\n";
+	cout << "\t\t-----------------------------------\n\n";
+	cout << "Name: " << temp->name << endl;
+	cout << "Registration/GA Number: " << temp->regno << endl;
+	cout << "No of Days Checked-In: " << days << endl;
+	cout << "Discount: " << temp->discount << "%" << endl;
+	cout << "Amount to be paid: " << messbill << endl << endl;
+	temp->messbill = messbill;
+
+	cout << "Do you want to Pay the bill? (Y/N)\n\n"
+		<< "Choose: ";
+	cin >> op;
+	if (op == 'Y' || op == 'y')
+	{
+		temp->money -= messbill;
+		cout << "Mess Bill Paid!\n\n";
+		messbill = 0;
+	}
+	system("pause");
+}
